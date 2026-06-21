@@ -1,0 +1,70 @@
+{\rtf1\ansi\ansicpg1252\cocoartf2870
+\cocoatextscaling0\cocoaplatform0{\fonttbl\f0\fswiss\fcharset0 Helvetica;}
+{\colortbl;\red255\green255\blue255;}
+{\*\expandedcolortbl;;}
+\paperw11900\paperh16840\margl1440\margr1440\vieww11520\viewh8400\viewkind0
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
+
+\f0\fs24 \cf0 \
+-- 62) Which employee made which sale? Join the `employees` table onto the `transactions` table by `employee_id`. You only need to include the employee's first/last name from `employees`.\
+SELECT\
+    t.*,\
+    e.firstname,\
+    e.lastname\
+FROM transactions t\
+JOIN employees e ON t.employee_id = e.ID;\
+\
+-- 63) What is the name of the employee who made the most in sales? Find this answer by doing a join as in the previous problem. Your resulting query will be difficult for someone else to read.\
+SELECT\
+    e.firstname,\
+    e.lastname,\
+    SUM(t.unit_price * t.quantity) AS total_sales\
+FROM transactions t\
+JOIN employees e ON t.employee_id = e.ID\
+GROUP BY t.employee_id\
+ORDER BY total_sales DESC\
+LIMIT 1;\
+-- Anna	Fischer	124372.25\
+\
+-- 64) Solve the previous problem by joining `employees` onto the `trans_by_employee` view.\
+SELECT\
+    e.firstname,\
+    e.lastname,\
+    tbe.total_cost\
+FROM trans_by_employee tbe\
+JOIN employees e ON tbe.employee_id = e.ID\
+ORDER BY tbe.total_cost DESC\
+LIMIT 1;\
+\
+-- 65) Next, the company will try to give bonuses based on performance. Show all employees who've made more in sales than 1.5 times their salary.\
+SELECT\
+    e.firstname,\
+    e.lastname,\
+    e.salary,\
+    tbe.total_cost AS total_sales\
+FROM trans_by_employee tbe\
+JOIN employees e ON tbe.employee_id = e.ID\
+WHERE tbe.total_cost > 1.5 * e.salary;\
+\
+-- 66) Do we have potentially erroneous rows? Find all transactions which occurred _before_ the employee was even hired! (Make sure each transaction only occupies one row).\
+SELECT DISTINCT\
+    t.order_id,\
+    t.customer,\
+    t.orderdate,\
+    e.firstname,\
+    e.lastname,\
+    e.startdate\
+FROM transactions t\
+JOIN employees e ON t.employee_id = e.ID\
+WHERE t.orderdate < e.startdate;\
+\
+-- 67) Among all transactions that occurred from 2015 to 2019, create a table that is the monthly revenue of our company versus the total trading volume of Yum! in that month. Format the columns nicely. (Hint: look at the views) That is, a sample row of your result might look like this:\
+SELECT\
+    y.year,\
+    y.month,\
+    PRINTF('$%,.2d', t.total_cost) AS company_revenue,\
+    PRINTF('%,d', CAST(y.tot_volume AS INTEGER)) AS yum_trade_volume\
+FROM trans_by_month t\
+JOIN yum_by_month y ON t.year = y.year AND t.month = y.month\
+ORDER BY y.year, y.month;\
+}

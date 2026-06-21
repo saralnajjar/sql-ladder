@@ -1,0 +1,244 @@
+{\rtf1\ansi\ansicpg1252\cocoartf2870
+\cocoatextscaling0\cocoaplatform0{\fonttbl\f0\fswiss\fcharset0 Helvetica;}
+{\colortbl;\red255\green255\blue255;}
+{\*\expandedcolortbl;;}
+\paperw11900\paperh16840\margl1440\margr1440\vieww11520\viewh8400\viewkind0
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
+
+\f0\fs24 \cf0 -- 32) How many rows are in the `pets` table?\
+SELECT count(*)\
+FROM pets;\
+-- 13\
+\
+-- 33) How many female pets are in the `pets` table?\
+SELECT count(sex)\
+FROM pets\
+WHERE sex like 'f';\
+-- 7\
+\
+-- 34) How many female cats are in the `pets` table?\
+SELECT count(*) as total_female_cats\
+FROM pets\
+WHERE sex like 'f' and species like 'cat';\
+-- 4\
+\
+-- 35) What's the mean age of pets in the `pets` table?\
+SELECT round(avg(age), 3) as avg_age\
+FROM pets;\
+-- around 5.231 years\
+\
+-- 36) What's the mean age of dogs in the `pets` table?\
+SELECT round(avg(age), 3) as avg_dog_age\
+FROM pets \
+WHERE species like 'dog';\
+-- 6.5 years\
+\
+-- 37) What's the mean age of male dogs in the `pets` table?\
+SELECT round(avg(age), 3) as avg_dog_age\
+FROM pets \
+WHERE species like 'dog' and sex like 'm';\
+-- 8.333 years\
+\
+-- 38) What's the count, mean, minimum, and maximum of pet ages in the `pets` table?\
+SELECT count(age) as total_pets, avg(age) as mean, min(age) as minimum_age, max(age) as maximum_age\
+FROM pets;\
+-- count: 13, mean aprox: 5.23, minimum: 1, maximum: 10\
+\
+-- 39) Repeat the previous problem with the following stipulations:\
+--     * Round the average to one decimal place.\
+--     * Give each column a human-readable column name (for example, "Average Age")\
+SELECT count(age) as total_pets, round(avg(age), 1) as mean, min(age) as minimum_age, max(age) as maximum_age\
+FROM pets;\
+\
+-- 40) How many rows in `employees_null` have missing salaries?\
+SELECT count(*)\
+FROM employees_null\
+WHERE salary is NULL;\
+-- 10\
+\
+-- 41) How many salespeople in `employees_null` having _nonmissing_ salaries?\
+SELECT count(*)\
+FROM employees_null\
+WHERE salary is NOT NULL;\
+-- 91\
+\
+-- 42) What's the mean salary of employees who joined the company after 2010? Go back to the usual `employees` table for this one.\
+SELECT avg(salary)\
+FROM employees_null\
+WHERE CAST(SUBSTR(startdate, 1, 4) AS INTEGER) > 2010;\
+-- aprox 81070.58\
+\
+-- 43) What's the mean salary of employees in Swiss Francs?\
+SELECT AVG(CAST(salary AS DECIMAL(10,2)) / 0.97) AS avg_salary_CHF\
+FROM employees_null;\
+-- aprox: 80443.34\
+\
+-- 44) Create a query that computes the mean salary in USD as well as CHF. Give the columns human-readable names (for example "Mean Salary in USD"). Also, format them with comma delimiters and currency symbols.\
+SELECT \
+	'$' || printf('%,d', CAST(AVG(salary) as INT)) as avg_salary_usd, \
+	'FR. ' ||printf('%,d', CAST(AVG(salary) / 0.97 as INT))AS avg_salary_CHF\
+FROM employees_null;\
+\
+-- 45) What is the average age of `pets` by species?\
+SELECT avg(age)\
+FROM pets\
+GROUP BY species;\
+-- cat: 4.33, dog: 6.5, lobster: 3.0\
+\
+-- 46) Repeat the previous problem but make sure the species label is also displayed! Assume this behavior is always being asked of you any time you use `GROUP BY`.\
+SELECT species, avg(age)\
+FROM pets\
+GROUP BY species;\
+\
+-- 47) What is the count, mean, minimum, and maximum age by species in `pets`?\
+SELECT species, count(age) as total_pets, avg(age) as mean, min(age) as minimum_age, max(age) as maximum_age\
+FROM pets\
+GROUP BY species;\
+-- cat: 6, 4.33,	2	,7\
+-- dog	6	,6,.5, 1, 10\
+-- lobster	1, 3.0, 3, 3\
+\
+-- 48) Show the mean salaries of each job title in `employees`.\
+SELECT job , round(avg(salary), 2)\
+FROM employees\
+GROUP BY job;\
+-- Administrator	71986.14\
+-- IT	71381.0\
+-- Operations	74055.25\
+-- Sales	80778.04\
+\
+-- 49) Show the mean salaries in New Zealand dollars of each job title in `employees`.\
+SELECT job, AVG(CAST(salary AS DECIMAL(10,2)) / 1.65) AS avg_salary_NZD\
+FROM employees_null\
+GROUP BY job;\
+-- NULL	-0.606060606060606\
+-- Administrator	44431.8686868687\
+-- IT	43261.2121212121\
+-- Operations	44881.9696969697\
+-- Sales	49643.7575757576\
+\
+-- 50) Show the mean, min, and max salaries of each job title in `employees`, as well as the numbers of employees in each category.\
+SELECT job, count(salary) as total_pets, avg(salary) as mean, min(salary) as minimum_saary, max(salary) as maximum_salary\
+FROM employees\
+GROUP BY job;\
+-- Administrator	14	71986.1428571429	41151	120492\
+-- IT	10	71381.0	37397	115729\
+-- Operations	8	74055.25	41797	108989\
+-- Sales	68	80778.0441176471	31333	124474\
+\
+-- 51) Show the mean salaries of each job title in `employees` sorted descending by salary.\
+SELECT job , round(avg(salary), 2)\
+FROM employees\
+GROUP BY job\
+ORDER BY salary DESC;\
+-- Sales	80778.04\
+-- IT	71381.0\
+-- Operations	74055.25\
+-- Administrator	71986.14\
+\
+-- 52) What are the top 5 most common first names among `employees`?\
+SELECT firstname, count(*) as name_count\
+FROM employees\
+GROUP BY firstname\
+ORDER BY name_count DESC\
+LIMIT 5;\
+-- Thomas	3\
+-- Robert	3\
+-- Michael	3\
+-- Lisa	3\
+-- William	2\
+\
+-- 53) Show all first names which have exactly 2 occurrences in `employees`.\
+SELECT firstname, count(*) as name_count\
+FROM employees\
+GROUP BY firstname\
+HAVING count(*) = 2;\
+-- Christopher\
+-- Donald\
+-- Elizabeth\
+-- Jacob\
+-- Joseph\
+-- Leslie\
+-- Mark\
+-- Shannon\
+-- William\
+\
+-- 54) Take a look at the `transactions` table to get a idea of what it contains. Note that a transaction may span multiple rows if different items are purchased as part of the same order. The employee who made the order is also given by their ID.\
+SELECT *\
+FROM transactions;\
+\
+-- 55) Show the top 5 largest orders (and their respective customer) in terms of the numbers of items purchased in that order.\
+SELECT order_id, customer, sum(quantity) AS total_items_purchased\
+FROM transactions\
+GROUP BY order_id, customer\
+ORDER BY total_items_purchased DESC\
+LIMIT 5;\
+-- 2415	Watson-Sanders	163\
+-- 4565	Miller-Cantu	155\
+-- 6324	Taylor, Patel and Harvey	149\
+-- 2190	Griffin, Jones and Foster	147\
+-- 5900	Hunter Group	147\
+\
+-- 56) Show the total cost of each transaction.\
+SELECT order_id, SUM(quantity * unit_price) AS total_transaction_cost\
+FROM transactions\
+GROUP BY order_id;\
+\
+-- 57) Show the top 5 transactions in terms of total cost.\
+SELECT order_id, SUM(quantity * unit_price) AS total_transaction_cost\
+FROM transactions\
+GROUP BY order_id\
+ORDER BY total_transaction_cost DESC\
+LIMIT 5;\
+-- 2190	2369.75\
+-- 6324	2333.5\
+-- 3009	2317.25\
+-- 4726	2300.25\
+-- 2415	2297.75\
+\
+-- 58) Show the top 5 customers in terms of total revenue (ie, which customers have we done the most business with in terms of money?)\
+SELECT customer, SUM(quantity * unit_price)\
+FROM transactions\
+GROUP BY customer\
+ORDER BY SUM(quantity * unit_price) DESC\
+LIMIT 5;\
+-- Griffin, Jones and Foster\
+-- Taylor, Patel and Harvey\
+-- Martin, Parker and Jones\
+-- Moore, Odonnell and Adams\
+-- Watson-Sanders\
+\
+-- 59) Show the top 5 employees in terms of revenue generated (ie, which employees made the most in sales?)\
+SELECT \
+    e.id,\
+    e.firstname,\
+    e.lastname,\
+    SUM(t.quantity * t.unit_price) AS total_revenue\
+FROM employees e\
+JOIN transactions t ON e.id = t.employee_id\
+GROUP BY e.id, e.firstname, e.lastname\
+ORDER BY total_revenue DESC\
+LIMIT 5;\
+-- 60	Anna	Fischer\
+-- 97	Brittany	Maynard\
+-- 55	Julian	Martinez\
+-- 73	Miguel	Williams\
+-- 65	Michael	West\
+\
+-- 60) Which customer worked with the largest number of employees?\
+SELECT customer,\
+    COUNT(DISTINCT employee_id) AS unique_employee_count\
+FROM transactions\
+GROUP BY customer\
+ORDER BY unique_employee_count DESC\
+LIMIT 1;\
+-- Kelly-Wright	61\
+\
+-- 61) Show all customers who've done more than $80,000 worth of business with us.\
+SELECT \
+    customer,\
+    SUM(quantity * unit_price) AS total_business_usd\
+FROM transactions\
+GROUP BY customer\
+HAVING SUM(quantity * unit_price) > 80000\
+ORDER BY total_business_usd DESC;}
