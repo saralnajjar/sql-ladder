@@ -1,4 +1,4 @@
 # SQL Ladder
 ### Ladder 1: SQL Basics  
-### Ladder 2: Group By & Having
-### Ladder 3: Joins 
+### Ladder 2: GROUP BY & HAVING
+### Ladder 3: JOINs 
